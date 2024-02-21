@@ -1,0 +1,74 @@
+#!/bin/bash
+
+#sunset_or_sunrise='sunrise' #sunrise or sunset or solar_noon or civil_twilight_begin or civil_twilight_end or nautical_twilight_begin or nautical_twilight_end or astronomical_twilight_begin or astronomical_twilight_end
+
+#lat=63.71 #latitude
+#long=2.17 #longitude
+
+
+
+if [ -z ${sunset_or_sunrise} ]; then
+    allowed_args="sunrise sunset solar_noon civil_twilight_begin civil_twilight_end nautical_twilight_begin nautical_twilight_end astronomical_twilight_begin astronomical_twilight_end"
+    if [ $# -gt 1 ]; then
+      echo "Error: You must provide only one argument" >&2
+      echo "Usage: $0 {sunrise|sunset|solar_noon|civil_twilight_begin|civil_twilight_end|nautical_twilight_begin|nautical_twilight_end|astronomical_twilight_begin|astronomical_twilight_end}"
+      exit 1
+    fi;
+    if [ $# -eq 0 ]; then
+      echo "You must specify an argument" >&2
+      echo "Usage: $0 {sunrise|sunset|solar_noon|civil_twilight_begin|civil_twilight_end|nautical_twilight_begin|nautical_twilight_end|astronomical_twilight_begin|astronomical_twilight_end}"
+      exit 1
+    fi;
+    if [[ ! " $allowed_args " =~ " $1 " ]]; then
+      echo "'$1' is not a valid argument" >&2
+      echo "Usage: $0 {sunrise|sunset|solar_noon|civil_twilight_begin|civil_twilight_end|nautical_twilight_begin|nautical_twilight_end|astronomical_twilight_begin|astronomical_twilight_end}"
+      exit 1 
+    fi ;
+    sunset_or_sunrise=$1
+fi;
+
+if [ -z ${lat} ] && [ -z ${long} ]; then
+    lat=$(curl -s https://ipapi.co/latitude/)
+    long=$(curl -s https://ipapi.co/longitude/)
+    city=$(curl -s https://ipapi.co/city/)
+    region=$(curl -s https://ipapi.co/region/)
+    country=$(curl -s https://ipapi.co/country/)
+
+    echo "Your city is : $city in $region ($country). Your latitude is : $lat and your longitude is : $long"
+fi;
+
+response_full=$(curl -s "https://api.sunrise-sunset.org/json?lat=$lat&lng=$long&formatted=0&date=today")
+response=$(echo $response_full | jq -r ".results.$sunset_or_sunrise")
+time=$(echo $response | cut -dT -f2 | cut -d+ -f1)
+now=$(date +%s)
+wait_time=$(($(date -u -d "$time" +%s)-now))
+
+if [ $wait_time -lt 0 ]; then
+    echo "The $sunset_or_sunrise time has already passed. Will try to find the $sunset_or_sunrise time for tomorrow..."
+    response_full=$(curl -s "https://api.sunrise-sunset.org/json?lat=$lat&lng=$long&formatted=0&date=tomorrow")
+    response=$(echo $response_full | jq -r ".results.$sunset_or_sunrise")
+    time=$(echo $response | cut -dT -f2 | cut -d+ -f1)
+    now=$(date +%s)
+    wait_time=$(($(date -u -d "$time" +%s)-now+86400))
+    echo "Waiting for $wait_time seconds until the $sunset_or_sunrise at $time UTC tomorrow..."
+    sleep $wait_time
+    echo "$sunset_or_sunrise !"
+else
+  echo "Waiting for $wait_time seconds until the $sunset_or_sunrise at $time UTC today..."
+  sleep $wait_time
+  echo "$sunset_or_sunrise !"
+fi
+
+#results	
+#    sunrise	"2024-02-18T06:52:15+00:00"
+#    sunset	"2024-02-18T17:19:35+00:00"
+#    solar_noon	"2024-02-18T12:05:55+00:00"
+#    day_length	37640
+#    civil_twilight_begin	"2024-02-18T06:22:07+00:00"
+#    civil_twilight_end	"2024-02-18T17:49:43+00:00"
+#    nautical_twilight_begin	"2024-02-18T05:45:55+00:00"
+#    nautical_twilight_end	"2024-02-18T18:25:55+00:00"
+#    astronomical_twilight_begin	"2024-02-18T05:10:02+00:00"
+#    astronomical_twilight_end	"2024-02-18T19:01:49+00:00"
+#status	"OK"
+#tzid	"UTC"
