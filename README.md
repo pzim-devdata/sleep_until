@@ -9,14 +9,14 @@ It automatically calculates the time of the event based on geographic location a
 To install sleep_until, run one of the following commands. It will be automatically added to your PATH: 
 
 ```
-sudo wget -O /usr/local/bin/sleep_until https://github.com/pzim-devdata/repo/raw/main/sleep_until
+sudo wget -O /usr/local/bin/sleep_until https://github.com/pzim-devdata/sleep_until/blob/main/sleep_until
 sudo chmod +x /usr/local/bin/sleep_until
 ```
 
 Or
 
 ```
-sudo curl -o /usr/local/bin/sleep_until https://github.com/pzim-devdata/repo/raw/main/sleep_until
+sudo curl -o /usr/local/bin/sleep_until https://github.com/pzim-devdata/sleep_until/blob/main/sleep_until
 sudo chmod +x /usr/local/bin/sleep_until
 ```
 
