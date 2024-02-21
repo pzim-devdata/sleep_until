@@ -81,13 +81,13 @@ sleep_until sunrise && sleep 600 && ./my_script.sh
 - Run script at dawn:
 
 ```bash 
-sleep_untill civil_twilight_start && ./my_script.sh  
+sleep_until civil_twilight_start && ./my_script.sh  
 ```
 
 - Schedule at midnight, every day, a backup at solar noon with Crontab:
 
 ```cron
-0 0 * * * sleep_untill solar_noon && ./backup.sh
+0 0 * * * sleep_until solar_noon && ./backup.sh
 ```
 
 - Schedule at midnight, every day, a morning task at civil dawn with Crontab: 
