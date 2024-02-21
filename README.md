@@ -99,7 +99,7 @@ sleep_untill civil_twilight_start && ./my_script.sh
 - Suspend execution during the night:
 
 ```bash
-while sleep_untill sunrise; do
+while sleep_until sunrise; do
   # Process to perform during day
 done
 ```
